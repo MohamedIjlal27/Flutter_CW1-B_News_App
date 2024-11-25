@@ -38,31 +38,13 @@ class NewsDetailScreen extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 10),
-            Text(
+            const Text(
               'Comments:',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                itemCount: comments.length,
-                itemBuilder: (context, index) {
-                  final comment = comments[index];
-                  return ListTile(
-                    title: Text(comment.userName),
-                    subtitle: Text(comment.text),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        // Handle delete comment
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
             TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Add a comment',
                 border: OutlineInputBorder(),
               ),

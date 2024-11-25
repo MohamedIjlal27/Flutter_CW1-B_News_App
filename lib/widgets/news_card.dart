@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:my_news_app/screens/news_details_screen.dart';
 import '../models/news_model.dart';
-import '../screens/news_detail_screen.dart';
 
 class NewsCard extends StatelessWidget {
   final News news;
