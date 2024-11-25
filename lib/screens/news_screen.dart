@@ -133,6 +133,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 itemCount: filteredLatestNews.length,
                 itemBuilder: (context, index) {
                   if (filteredLatestNews[index].title != '[Removed]') {
+                    print("Article ID: ${filteredLatestNews[index].id}");
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: NewsCard(news: filteredLatestNews[index]),
