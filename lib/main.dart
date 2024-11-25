@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:my_news_app/providers/user_provider.dart';
 import 'package:my_news_app/screens/login_screen.dart';
 import 'package:my_news_app/screens/news_screen.dart';
 import 'providers/news_provider.dart';
 import 'package:provider/provider.dart';
 import '../service/auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +21,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NewsProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -25,35 +29,64 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: FutureBuilder(
-          future: _checkLoginStatus(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasData && snapshot.data == true) {
-              return NewsScreen(); // User is logged in
-            } else {
-              return const LoginScreen(); // User is not logged in
-            }
-          },
-        ),
+        home: AuthCheck(), // Delegates home selection to AuthCheck
       ),
     );
   }
+}
 
-  Future<bool> _checkLoginStatus() async {
-    final credentials = await AuthService().getUserCredentials();
-    if (credentials['email'] != null && credentials['password'] != null) {
+class AuthCheck extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _checkLoginStatus(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData && snapshot.data == true) {
+          return NewsScreen();
+        } else {
+          return const LoginScreen();
+        }
+      },
+    );
+  }
+
+  Future<bool> _checkLoginStatus(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('email');
+    final password = prefs.getString('password');
+
+    if (email != null && password != null) {
       try {
-        await AuthService().signInWithEmailAndPassword(
-          email: credentials['email']!,
-          password: credentials['password']!,
-        );
-        return true; // Successfully logged in
+        // Attempt sign-in using stored credentials
+        await AuthService()
+            .signInWithEmailAndPassword(email: email, password: password);
+
+        // Fetch user details from Firestore
+        final userId = AuthService().currentUser?.uid ?? '';
+        if (userId.isNotEmpty) {
+          final userDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
+
+          if (userDoc.exists) {
+            final username = userDoc['username'] ?? '';
+
+            // Update UserProvider with fetched user details
+            Provider.of<UserProvider>(context, listen: false)
+                .setUser(userId, username);
+
+            return true; // User successfully logged in
+          }
+        }
+        return false;
       } catch (e) {
-        return false; // Failed to log in
+        print('Error during auto-login: $e');
+        return false; // Login failed
       }
     }
-    return false; // No credentials found
+    return false; // No stored credentials
   }
 }
