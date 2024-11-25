@@ -6,8 +6,6 @@ class CommentService {
 
   Future<void> addComment(
       String newsId, String text, String userId, String username) async {
-    print('User ID: $userId');
-    print('Username: $username');
     await _firestore.collection('comments').add({
       'newsId': newsId,
       'text': text,
@@ -17,6 +15,17 @@ class CommentService {
     });
   }
 
+  Future<void> updateComment(String commentId, String newText) async {
+    await _firestore.collection('comments').doc(commentId).update({
+      'text': newText,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteComment(String commentId) async {
+    await _firestore.collection('comments').doc(commentId).delete();
+  }
+
   Future<List<Comment>> getComments(String newsId) async {
     final snapshot = await _firestore
         .collection('comments')
@@ -24,6 +33,8 @@ class CommentService {
         .orderBy('timestamp', descending: true)
         .get();
 
-    return snapshot.docs.map((doc) => Comment.fromMap(doc.data())).toList();
+    return snapshot.docs
+        .map((doc) => Comment.fromMap(doc.data(), doc.id))
+        .toList();
   }
 }

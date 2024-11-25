@@ -58,6 +58,43 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
     }
   }
 
+  void _editComment(String commentId, String currentText) async {
+    String? newText = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        TextEditingController controller =
+            TextEditingController(text: currentText);
+        return AlertDialog(
+          title: Text('Edit Comment'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(labelText: 'Comment'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: Text('Save'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (newText != null && newText.isNotEmpty) {
+      await _commentService.updateComment(commentId, newText);
+      _fetchComments(); // Refresh comments after editing
+    }
+  }
+
+  void _deleteComment(String commentId) async {
+    await _commentService.deleteComment(commentId);
+    _fetchComments(); // Refresh comments after deletion
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,10 +174,23 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                     ),
                     title: Text(comment.username),
                     subtitle: Text(comment.text),
-                    trailing: Text(
-                      '${comment.timestamp.hour}:${comment.timestamp.minute}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
+                    trailing:
+                        comment.userId == Provider.of<UserProvider>(context).uid
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () =>
+                                        _editComment(comment.id, comment.text),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () => _deleteComment(comment.id),
+                                  ),
+                                ],
+                              )
+                            : null,
                   );
                 },
               ),
