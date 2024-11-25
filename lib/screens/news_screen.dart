@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/news_provider.dart';
 import '../widgets/news_card.dart';
 import '../widgets/top_headline_card.dart';
+import '../widgets/custom_bottom_navigation_bar.dart';
 
 class NewsScreen extends StatefulWidget {
   @override
@@ -13,12 +14,19 @@ class NewsScreen extends StatefulWidget {
 
 class _NewsScreenState extends State<NewsScreen> {
   String searchQuery = '';
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<NewsProvider>(context, listen: false).fetchNews();
+    });
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
     });
   }
 
@@ -30,8 +38,6 @@ class _NewsScreenState extends State<NewsScreen> {
         .where((news) =>
             news.title.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
-
-    print("Filtered Top Headlines: ${filteredTopHeadlines.length}");
 
     final filteredLatestNews = newsProvider.latestNews
         .where((news) =>
@@ -126,7 +132,6 @@ class _NewsScreenState extends State<NewsScreen> {
                 itemCount: filteredLatestNews.length,
                 itemBuilder: (context, index) {
                   if (filteredLatestNews[index].title != '[Removed]') {
-                    print("Article ID: ${filteredLatestNews[index].id}");
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: NewsCard(news: filteredLatestNews[index]),
@@ -140,25 +145,9 @@ class _NewsScreenState extends State<NewsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.red,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view),
-            label: 'Categories',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
