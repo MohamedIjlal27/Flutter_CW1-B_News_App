@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_news_app/screens/news_screen.dart';
 import 'package:my_news_app/screens/register_screen.dart';
 import '../service/auth.dart';
+import 'package:provider/provider.dart';
+import 'package:my_news_app/providers/user_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,6 +27,18 @@ class _LoginScreenState extends State<LoginScreen> {
         email: emailController.text,
         password: passwordController.text,
       );
+
+      String userId = AuthService().currentUser?.uid ?? '';
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      String username = userDoc['username'] ?? '';
+
+      Provider.of<UserProvider>(context, listen: false)
+          .setUser(userId, username);
+
       await AuthService()
           .saveUserCredentials(emailController.text, passwordController.text);
     } on FirebaseAuthException catch (e) {

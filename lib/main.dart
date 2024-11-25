@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:my_news_app/providers/user_provider.dart';
 import 'package:my_news_app/screens/login_screen.dart';
 import 'package:my_news_app/screens/news_screen.dart';
 import 'providers/news_provider.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NewsProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: FutureBuilder(
-          future: _checkLoginStatus(),
+          future: _checkLoginStatus(context),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Future<bool> _checkLoginStatus() async {
+  Future<bool> _checkLoginStatus(BuildContext context) async {
     final credentials = await AuthService().getUserCredentials();
     if (credentials['email'] != null && credentials['password'] != null) {
       try {
@@ -49,6 +51,13 @@ class MyApp extends StatelessWidget {
           email: credentials['email']!,
           password: credentials['password']!,
         );
+
+        // Set userId and username in UserProvider after successful login
+        final userId = '...'; // Fetch userId from your user data
+        final username = '...'; // Fetch username from your user data
+        Provider.of<UserProvider>(context, listen: false)
+            .setUser(userId, username);
+
         return true; // Successfully logged in
       } catch (e) {
         return false; // Failed to log in
