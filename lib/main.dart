@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: AuthCheck(), // Delegates home selection to AuthCheck
+        home: AuthCheck(),
       ),
     );
   }
@@ -59,11 +59,9 @@ class AuthCheck extends StatelessWidget {
 
     if (email != null && password != null) {
       try {
-        // Attempt sign-in using stored credentials
         await AuthService()
             .signInWithEmailAndPassword(email: email, password: password);
 
-        // Fetch user details from Firestore
         final userId = AuthService().currentUser?.uid ?? '';
         if (userId.isNotEmpty) {
           final userDoc = await FirebaseFirestore.instance
@@ -74,19 +72,17 @@ class AuthCheck extends StatelessWidget {
           if (userDoc.exists) {
             final username = userDoc['username'] ?? '';
 
-            // Update UserProvider with fetched user details
             Provider.of<UserProvider>(context, listen: false)
                 .setUser(userId, username);
 
-            return true; // User successfully logged in
+            return true;
           }
         }
         return false;
       } catch (e) {
-        print('Error during auto-login: $e');
-        return false; // Login failed
+        return false;
       }
     }
-    return false; // No stored credentials
+    return false;
   }
 }

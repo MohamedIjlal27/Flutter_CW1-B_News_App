@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: const TextStyle(color: Colors.black),
