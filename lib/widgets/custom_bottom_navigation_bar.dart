@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:my_news_app/screens/category_screen.dart';
+import 'package:my_news_app/screens/news_screen.dart';
 import 'package:my_news_app/screens/profile_screen.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -19,13 +21,21 @@ class CustomBottomNavigationBar extends StatelessWidget {
       unselectedItemColor: Colors.grey,
       currentIndex: currentIndex,
       onTap: (index) {
-        if (index == 2) {
+        if (index == 0) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NewsScreen()),
+          );
+        } else if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CategoryScreen()),
+          );
+        } else if (index == 2) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ProfileScreen()),
           );
-        } else {
-          onTap(index);
         }
       },
       items: const [
