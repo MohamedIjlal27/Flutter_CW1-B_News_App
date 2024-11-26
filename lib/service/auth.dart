@@ -1,28 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final FirebaseAuth _firebaseauth = FirebaseAuth.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  User? get currentUser => _firebaseauth.currentUser;
 
-  Stream<User?> get authStateChanges => _firebaseauth.authStateChanges();
+  User? get currentUser => _firebaseAuth.currentUser;
 
-  Future<void> signInWithEmailAndPassword(
-      {required String email, required String password}) async {
-    await _firebaseauth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+
+  Future<void> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    await _firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
   }
 
-  Future<void> createUserWithEmailAndPassword(
-      {required String email,
-      required String password,
-      required String username}) async {
+  Future<void> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+    required String username,
+  }) async {
     UserCredential userCredential =
-        await _firebaseauth.createUserWithEmailAndPassword(
+        await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -33,12 +36,82 @@ class AuthService {
   Future<void> saveUsernameToDatabase(String uid, String username) async {
     await _firestore.collection('users').doc(uid).set({
       'username': username,
-      'email': _firebaseauth.currentUser!.email,
+      'email': _firebaseAuth.currentUser!.email,
     });
   }
 
+  /// Update the username in Firestore
+  Future<void> updateUserName(String newUsername) async {
+    if (currentUser == null) throw Exception('User not logged in.');
+
+    await _firestore.collection('users').doc(currentUser!.uid).update({
+      'username': newUsername,
+    });
+  }
+
+  Future<void> updateEmail(String newEmail,
+      {String? currentPassword, required BuildContext context}) async {
+    if (currentUser == null) throw Exception('User not logged in.');
+
+    // Check if the user's email is verified
+    if (!currentUser!.emailVerified) {
+      throw Exception('Please verify your email before updating it.');
+    }
+
+    // If the user is not logged in or current password is not provided, do not proceed
+    if (currentPassword == null || currentPassword.isEmpty) {
+      throw Exception('Password is required for reauthentication.');
+    }
+
+    try {
+      // Create the credential for reauthentication
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: currentUser!.email!,
+        password: currentPassword,
+      );
+
+      // Reauthenticate the user with the provided credential
+      await currentUser!.reauthenticateWithCredential(credential);
+
+      // Now that the user is reauthenticated, update the email
+      await currentUser!.updateEmail(newEmail);
+
+      // Update email in Firestore
+      await _firestore.collection('users').doc(currentUser!.uid).update({
+        'email': newEmail,
+      });
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email updated successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update email: $e')),
+      );
+    }
+  }
+
+  /// Update the password in Firebase Auth
+  Future<void> updatePassword(String newPassword,
+      {String? currentPassword}) async {
+    if (currentUser == null) throw Exception('User not logged in.');
+
+    // Re-authenticate user if current password is provided
+    if (currentPassword != null) {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: currentUser!.email!,
+        password: currentPassword,
+      );
+      await currentUser!.reauthenticateWithCredential(credential);
+    }
+
+    // Update password in Firebase Auth
+    await currentUser!.updatePassword(newPassword);
+  }
+
   Future<void> signOut() async {
-    await _firebaseauth.signOut();
+    await _firebaseAuth.signOut();
   }
 
   Future<void> saveUserCredentials(String email, String password) async {

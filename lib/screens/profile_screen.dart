@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_news_app/widgets/profile_field.dart';
+import 'package:my_news_app/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../service/auth.dart';
+import '../widgets/profile_field.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -10,6 +14,110 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final AuthService _authService = AuthService();
+
+  Future<void> _editField({
+    required String fieldName,
+    required String currentValue,
+    required String userId,
+    bool isPassword = false,
+  }) async {
+    TextEditingController controller =
+        TextEditingController(text: isPassword ? '' : currentValue);
+
+    String? newValue = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit $fieldName'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: 'Enter new $fieldName',
+              border: const OutlineInputBorder(),
+            ),
+            obscureText: isPassword,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, controller.text.trim());
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (newValue == null || newValue.isEmpty) {
+      return; // Do nothing if no value is entered
+    }
+
+    try {
+      String? currentPassword;
+
+      if (fieldName == 'email' || fieldName == 'password') {
+        // Prompt for current password to reauthenticate
+        currentPassword = await _getCurrentPassword(context);
+      }
+
+      if (fieldName == 'username') {
+        await _authService.updateUserName(newValue);
+      } else if (fieldName == 'email' && currentPassword != null) {
+        await _authService.updateEmail(newValue,
+            context: context, currentPassword: currentPassword);
+      } else if (fieldName == 'password' && currentPassword != null) {
+        await _authService.updatePassword(newValue,
+            currentPassword: currentPassword);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$fieldName updated successfully!')),
+      );
+
+      setState(() {}); // Refresh the UI after update
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update $fieldName: $e')),
+      );
+    }
+  }
+
+  Future<String?> _getCurrentPassword(BuildContext context) async {
+    TextEditingController controller = TextEditingController();
+    return await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter your current password'),
+          content: TextField(
+            controller: controller,
+            obscureText: true,
+            decoration: const InputDecoration(
+              hintText: 'Current Password',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, controller.text.trim()),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -20,13 +128,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text('Profile'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
-        elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
+        elevation: 0,
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future:
@@ -39,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('User not found'));
+            return const Center(child: Text('User not found.'));
           }
 
           var userData = snapshot.data!.data() as Map<String, dynamic>;
@@ -54,14 +160,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   backgroundImage: AssetImage('assets/images/logo.png'),
                 ),
                 const SizedBox(height: 16),
-
-                // Username
                 Text(
                   userData['username'] ?? 'No Name',
                   style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
 
@@ -69,54 +171,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ProfileField(
                   icon: Icons.person,
                   value: userData['username'] ?? 'No Name',
-                  onTap: () {
-                    // Navigate to edit username screen
-                  },
+                  onTap: () => _editField(
+                    fieldName: 'username',
+                    currentValue: userData['username'] ?? '',
+                    userId: userId,
+                  ),
                 ),
-                ProfileField(
+                /* ProfileField(
                   icon: Icons.email,
                   value: userData['email'] ?? 'No Email',
-                  onTap: () {
-                    // Navigate to edit email screen
-                  },
-                ),
+                  onTap: () => _editField(
+                    fieldName: 'email',
+                    currentValue: userData['email'] ?? '',
+                    userId: userId,
+                  ),
+                ),*/
                 ProfileField(
                   icon: Icons.lock,
                   value: '********',
-                  onTap: () {
-                    // Navigate to change password screen
-                  },
+                  onTap: () => _editField(
+                    fieldName: 'password',
+                    currentValue: '',
+                    userId: userId,
+                    isPassword: true,
+                  ),
                 ),
-                ProfileField(
-                  icon: Icons.location_on,
-                  value: userData['location'] ?? 'No Location',
-                  onTap: () {
-                    // Navigate to edit location screen
-                  },
-                ),
-
                 const SizedBox(height: 8),
 
-                // Support Section
-                ListTile(
-                  leading: const Icon(Icons.support_agent),
-                  title: const Text('Support'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigate to support screen
-                  },
-                ),
-                const Divider(),
-
-                // Logout Button
+                // Logout Section
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
                   title: const Text(
                     'Log Out',
                     style: TextStyle(color: Colors.red),
                   ),
-                  onTap: () {
-                    // Handle logout functionality
+                  onTap: () async {
+                    await AuthService().clearUserCredentials();
+                    await AuthService().signOut();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()),
+                    );
                   },
                 ),
               ],
