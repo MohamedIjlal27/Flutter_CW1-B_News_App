@@ -53,14 +53,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (newValue == null || newValue.isEmpty) {
-      return; // Do nothing if no value is entered
+      return;
     }
 
     try {
       String? currentPassword;
 
       if (fieldName == 'email' || fieldName == 'password') {
-        // Prompt for current password to reauthenticate
         currentPassword = await _getCurrentPassword(context);
       }
 
@@ -78,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SnackBar(content: Text('$fieldName updated successfully!')),
       );
 
-      setState(() {}); // Refresh the UI after update
+      setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update $fieldName: $e')),
@@ -164,8 +163,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-
-                // Editable Profile Fields
                 ProfileField(
                   icon: Icons.person,
                   value: userData['username'] ?? 'No Name',
@@ -195,8 +192,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Logout Section
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
                   title: const Text(

@@ -40,7 +40,6 @@ class AuthService {
     });
   }
 
-  /// Update the username in Firestore
   Future<void> updateUserName(String newUsername) async {
     if (currentUser == null) throw Exception('User not logged in.');
 
@@ -53,35 +52,28 @@ class AuthService {
       {String? currentPassword, required BuildContext context}) async {
     if (currentUser == null) throw Exception('User not logged in.');
 
-    // Check if the user's email is verified
     if (!currentUser!.emailVerified) {
       throw Exception('Please verify your email before updating it.');
     }
 
-    // If the user is not logged in or current password is not provided, do not proceed
     if (currentPassword == null || currentPassword.isEmpty) {
       throw Exception('Password is required for reauthentication.');
     }
 
     try {
-      // Create the credential for reauthentication
       AuthCredential credential = EmailAuthProvider.credential(
         email: currentUser!.email!,
         password: currentPassword,
       );
 
-      // Reauthenticate the user with the provided credential
       await currentUser!.reauthenticateWithCredential(credential);
 
-      // Now that the user is reauthenticated, update the email
       await currentUser!.updateEmail(newEmail);
 
-      // Update email in Firestore
       await _firestore.collection('users').doc(currentUser!.uid).update({
         'email': newEmail,
       });
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Email updated successfully!')),
       );
@@ -92,12 +84,10 @@ class AuthService {
     }
   }
 
-  /// Update the password in Firebase Auth
   Future<void> updatePassword(String newPassword,
       {String? currentPassword}) async {
     if (currentUser == null) throw Exception('User not logged in.');
 
-    // Re-authenticate user if current password is provided
     if (currentPassword != null) {
       AuthCredential credential = EmailAuthProvider.credential(
         email: currentUser!.email!,
@@ -106,7 +96,6 @@ class AuthService {
       await currentUser!.reauthenticateWithCredential(credential);
     }
 
-    // Update password in Firebase Auth
     await currentUser!.updatePassword(newPassword);
   }
 

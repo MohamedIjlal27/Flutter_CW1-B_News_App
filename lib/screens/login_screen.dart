@@ -81,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             if (errorMessage.isNotEmpty)
               Text(errorMessage, style: const TextStyle(color: Colors.red)),
-            // Add a link to the register page
             TextButton(
               onPressed: () {
                 Navigator.push(

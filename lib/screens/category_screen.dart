@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:my_news_app/screens/categorised_news_screen.dart';
 
 class CategoryScreen extends StatelessWidget {
   final List<String> categories = [
-    'Work',
-    'Health',
-    'Holiday',
-    'Gift',
+    'Business',
+    'Political',
+    'Crime',
     'Ideas',
     'Sports',
-    'Music',
-    'Hiking',
+    'Cinema'
+  ];
+
+  final List<IconData> categoryIcons = [
+    Icons.business,
+    Icons.account_balance,
+    Icons.policy,
+    Icons.lightbulb_outline,
+    Icons.sports_soccer,
+    Icons.movie,
   ];
 
   @override
@@ -31,7 +39,10 @@ class CategoryScreen extends StatelessWidget {
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
-            return CategoryCard(category: categories[index]);
+            return CategoryCard(
+              category: categories[index],
+              icon: categoryIcons[index],
+            );
           },
         ),
       ),
@@ -41,8 +52,10 @@ class CategoryScreen extends StatelessWidget {
 
 class CategoryCard extends StatelessWidget {
   final String category;
+  final IconData icon;
 
-  const CategoryCard({Key? key, required this.category}) : super(key: key);
+  const CategoryCard({Key? key, required this.category, required this.icon})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +66,12 @@ class CategoryCard extends StatelessWidget {
       elevation: 4,
       child: InkWell(
         onTap: () {
-          // Handle category selection
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CategorisedNewsScreen(category: category),
+            ),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -65,7 +83,7 @@ class CategoryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.category, // Replace with appropriate icons
+                  icon,
                   size: 40,
                   color: Colors.blue,
                 ),

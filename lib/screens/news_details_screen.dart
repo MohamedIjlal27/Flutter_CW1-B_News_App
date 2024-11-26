@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/news_model.dart';
-import '../models/comment_model.dart'; // Import the Comment model
+import '../models/comment_model.dart';
 import '../service/comment_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
@@ -54,7 +54,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
       await _commentService.addComment(widget.news.id, text, userId, username);
       _commentController.clear();
       _toggleCommentField();
-      _fetchComments(); // Refresh comments after adding a new one
+      _fetchComments();
     }
   }
 
@@ -86,13 +86,13 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
 
     if (newText != null && newText.isNotEmpty) {
       await _commentService.updateComment(commentId, newText);
-      _fetchComments(); // Refresh comments after editing
+      _fetchComments();
     }
   }
 
   void _deleteComment(String commentId) async {
     await _commentService.deleteComment(commentId);
-    _fetchComments(); // Refresh comments after deletion
+    _fetchComments();
   }
 
   @override
@@ -160,7 +160,6 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                 ],
               ),
             const SizedBox(height: 20),
-            // Display comments
             Expanded(
               child: ListView.builder(
                 itemCount: _comments.length,
