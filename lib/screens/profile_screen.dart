@@ -4,7 +4,12 @@ import 'package:my_news_app/widgets/profile_field.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -44,24 +49,9 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Profile Picture with Edit Icon
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: NetworkImage(userData['profileImage'] ??
-                          'https://via.placeholder.com/150'),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.edit, size: 18),
-                      ),
-                    ),
-                  ],
+                const CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/images/logo.png'),
                 ),
                 const SizedBox(height: 16),
 
