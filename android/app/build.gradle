@@ -53,10 +53,10 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     // Example: Add Firebase Auth if needed
-    // implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth")
 
     // Example: Add Firestore if needed
-    // implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-firestore")
 
     // Add other Firebase dependencies here as needed
 }
