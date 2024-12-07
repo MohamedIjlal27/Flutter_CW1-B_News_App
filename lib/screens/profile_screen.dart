@@ -7,6 +7,8 @@ import '../service/auth.dart';
 import '../widgets/profile_field.dart';
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -65,9 +67,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (fieldName == 'username') {
         await _authService.updateUserName(newValue);
-      } else if (fieldName == 'email' && currentPassword != null) {
-        await _authService.updateEmail(newValue,
-            context: context, currentPassword: currentPassword);
       } else if (fieldName == 'password' && currentPassword != null) {
         await _authService.updatePassword(newValue,
             currentPassword: currentPassword);

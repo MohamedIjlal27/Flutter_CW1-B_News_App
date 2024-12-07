@@ -8,6 +8,8 @@ import '../widgets/top_headline_card.dart';
 import '../widgets/custom_bottom_navigation_bar.dart';
 
 class NewsScreen extends StatefulWidget {
+  const NewsScreen({super.key});
+
   @override
   _NewsScreenState createState() => _NewsScreenState();
 }

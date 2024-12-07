@@ -6,8 +6,7 @@ import '../widgets/news_card.dart';
 class CategorisedNewsScreen extends StatelessWidget {
   final String category;
 
-  const CategorisedNewsScreen({Key? key, required this.category})
-      : super(key: key);
+  const CategorisedNewsScreen({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {

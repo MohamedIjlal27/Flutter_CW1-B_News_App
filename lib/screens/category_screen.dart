@@ -20,6 +20,8 @@ class CategoryScreen extends StatelessWidget {
     Icons.movie,
   ];
 
+  CategoryScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
@@ -46,42 +45,6 @@ class AuthService {
     await _firestore.collection('users').doc(currentUser!.uid).update({
       'username': newUsername,
     });
-  }
-
-  Future<void> updateEmail(String newEmail,
-      {String? currentPassword, required BuildContext context}) async {
-    if (currentUser == null) throw Exception('User not logged in.');
-
-    if (!currentUser!.emailVerified) {
-      throw Exception('Please verify your email before updating it.');
-    }
-
-    if (currentPassword == null || currentPassword.isEmpty) {
-      throw Exception('Password is required for reauthentication.');
-    }
-
-    try {
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: currentUser!.email!,
-        password: currentPassword,
-      );
-
-      await currentUser!.reauthenticateWithCredential(credential);
-
-      await currentUser!.updateEmail(newEmail);
-
-      await _firestore.collection('users').doc(currentUser!.uid).update({
-        'email': newEmail,
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email updated successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update email: $e')),
-      );
-    }
   }
 
   Future<void> updatePassword(String newPassword,

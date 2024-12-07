@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/news_model.dart';
 import '../models/comment_model.dart';
@@ -8,7 +9,7 @@ import '../providers/user_provider.dart';
 class NewsDetailScreen extends StatefulWidget {
   final News news;
 
-  const NewsDetailScreen({Key? key, required this.news}) : super(key: key);
+  const NewsDetailScreen({super.key, required this.news});
 
   @override
   _NewsDetailScreenState createState() => _NewsDetailScreenState();
@@ -30,12 +31,13 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
     try {
       List<Comment> comments =
           await _commentService.getComments(widget.news.id);
-      print('Fetched comments: ${comments.length}');
       setState(() {
         _comments = comments;
       });
     } catch (e) {
-      print('Error fetching comments: $e');
+      if (kDebugMode) {
+        print('Error fetching comments: $e');
+      }
     }
   }
 
