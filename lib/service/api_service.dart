@@ -1,3 +1,7 @@
+/*News API – search news and blog articles on the web (no date) News API â Search News and Blog Articles on the Web. Available at: https://newsapi.org/
+(Accessed: 02 December 2024). 
+*/
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/news_model.dart';

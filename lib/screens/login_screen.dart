@@ -1,3 +1,8 @@
+/*Flutter Documentation (Google), (2024) Widget catalog. 
+Available at: https://flutter.dev/docs/ui/widgets 
+(Accessed: 20 November 2024).
+*/
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

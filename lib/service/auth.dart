@@ -1,3 +1,7 @@
+/*
+Google (no date) Firebase authentication, Google. Available at: https://firebase.google.com/docs/auth (Accessed: 01 December 2024). 
+*/
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';

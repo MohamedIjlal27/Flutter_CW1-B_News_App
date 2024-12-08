@@ -1,3 +1,7 @@
+/*
+Get started with Cloud Firestore  |  Firebase (no date a) Google. Available at: https://firebase.google.com/docs/firestore/quickstart (Accessed: 02 December 2024).  
+*/
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/comment_model.dart';
 

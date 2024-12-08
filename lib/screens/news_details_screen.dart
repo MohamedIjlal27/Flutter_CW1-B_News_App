@@ -1,3 +1,8 @@
+/*Flutter Documentation (Google), (2024) Widget catalog. 
+Available at: https://flutter.dev/docs/ui/widgets 
+(Accessed: 20 November 2024).
+*/
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/news_model.dart';
@@ -9,7 +14,7 @@ import '../providers/user_provider.dart';
 class NewsDetailScreen extends StatefulWidget {
   final News news;
 
-  const NewsDetailScreen({super.key, required this.news});
+  const NewsDetailScreen({Key? key, required this.news}) : super(key: key);
 
   @override
   _NewsDetailScreenState createState() => _NewsDetailScreenState();

@@ -1,3 +1,7 @@
+/*Flutter Documentation (Google), (2024) Widget catalog. 
+Available at: https://flutter.dev/docs/ui/widgets 
+(Accessed: 20 November 2024).
+*/
 import 'package:flutter/material.dart';
 import 'package:mobile_application_development_cw1b/service/api_service.dart';
 import '../models/news_model.dart';

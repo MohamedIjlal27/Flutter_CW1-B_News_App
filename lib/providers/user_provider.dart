@@ -1,3 +1,8 @@
+/*Flutter Documentation (Google), (2024) provider. 
+Available at: https://pub.dev/packages/provider
+(Accessed: 28 November 2024).
+*/
+
 import 'package:flutter/material.dart';
 
 class UserProvider with ChangeNotifier {
