@@ -11,6 +11,7 @@ import '../service/auth.dart';
 import '../providers/user_provider.dart';
 import '../screens/news_screen.dart';
 import '../screens/register_screen.dart';
+import '../screens/forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -192,7 +193,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.only(top: 8.0, right: 4.0),
                       child: GestureDetector(
                         onTap: () {
-                          // Add forgot password functionality here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgotPasswordScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           'Forgot Password?',

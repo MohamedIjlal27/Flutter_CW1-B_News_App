@@ -88,4 +88,12 @@ class AuthService {
     await prefs.remove('email');
     await prefs.remove('password');
   }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception('Failed to send reset email: $e');
+    }
+  }
 }
